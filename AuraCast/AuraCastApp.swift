@@ -13,21 +13,13 @@ struct AuraCastApp: App {
     // Erstelle eine einzelne Instanz des WeatherViewModels, die von allen Views geteilt wird.
     // @StateObject stellt sicher, dass das ViewModel über den Lebenszyklus der App persistiert.
     @StateObject private var weatherViewModel = WeatherViewModel()
-
+    
     @State var currentNumber: String = "1" // Dies ist ein Beispiel-Status, der im Menüleisten-Icon angezeigt wird
     
-    // API-Informationen direkt in der App-Struktur für den Start des ViewModels
-    // Diese werden nun an MenuContentView übergeben, wo der Timer gestartet wird.
-    private let stationId = "IMELLE143" // Beispiel: "KMAHANOV10"
-    private let apiKey = "50ca47653ab440628a47653ab47062a3" // Dein persönlicher API-Schlüssel
-
-    // Der init()-Block wurde entfernt, da der Datenabruf nun im MenuContentView.onAppear gestartet wird.
-    // init() { ... }
-
     var body: some Scene {
         MenuBarExtra(currentNumber, systemImage: "\(currentNumber).circle") {
-            // Verwende das neue MenuContentView hier und übergebe das ViewModel und die API-Infos.
-            MenuContentView(viewModel: weatherViewModel, stationId: stationId, apiKey: apiKey)
+            // Übergebe nur das ViewModel an MenuContentView. API-Infos werden intern verwaltet.
+            MenuContentView(viewModel: weatherViewModel) // <-- stationId und apiKey Parameter entfernt
         }
         .menuBarExtraStyle(.window) // Setzt den Stil auf .window
         
@@ -38,5 +30,16 @@ struct AuraCastApp: App {
         }
         // Optional: Standardgröße für das Hauptfenster festlegen
         .defaultSize(width: 800, height: 600)
+        
+#if os(macOS)
+        Settings {
+            SettingsView()
+        }
+        // Neues Fenster für die Einstellungen, das über openWindow(id: "settingsWindow") geöffnet werden kann
+        WindowGroup(id: "settingsWindow") { // <-- Hinzugefügt: WindowGroup für SettingsView
+            SettingsView()
+        }
+        .defaultSize(width: 500, height: 350) // Standardgröße für das Einstellungsfenster
+#endif
     }
 }

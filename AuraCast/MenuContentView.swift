@@ -15,8 +15,9 @@ struct MenuContentView: View {
     @ObservedObject var viewModel: WeatherViewModel
     
     // Empfängt API-Informationen von der AuraCastApp.
-    let stationId: String
-    let apiKey: String
+    // Diese sind jetzt nicht mehr nötig, da das ViewModel sie direkt aus AppStorage liest.
+    // let stationId: String // <-- Entfernt
+    // let apiKey: String    // <-- Entfernt
     
     // Zugriff auf die Umgebungsvariable, um Fenster programmatisch zu öffnen.
     @Environment(\.openWindow) var openWindow
@@ -38,12 +39,25 @@ struct MenuContentView: View {
                 openWindow(id: "mainWindow")
             } label: {
                 HStack {
-                    Image(systemName: "rectangle.split.2x1") // SF Symbol für Fenster
+                    Image(systemName: "rectangle.split.2x1") // Symbol für Fenster
+                        .font(.title2)
                     Text("Hauptfenster öffnen")
                 }
             }
             .keyboardShortcut("o", modifiers: .command)
             .foregroundColor(.white) // Text des Buttons weiß färben
+            
+            // Neuer Button, um das Einstellungsfenster zu öffnen
+            Button {
+                openWindow(id: "settingsWindow")
+            } label: {
+                HStack {
+                    Image(systemName: "gearshape.fill") // SF Symbol für Einstellungen
+                    Text("Einstellungen")
+                }
+            }
+            .keyboardShortcut(",", modifiers: .command) // Cmd+, ist Standard für Einstellungen
+            .foregroundColor(.white)
             
             Divider()
                 .background(Color.white.opacity(0.5)) // Teiler auch heller machen
@@ -61,7 +75,8 @@ struct MenuContentView: View {
             
             // WICHTIG: Starte den Datenabruf und den Timer, sobald dieses View erscheint.
             .onAppear {
-                viewModel.startFetchingDataAutomatically(stationId: stationId, apiKey: apiKey)
+                // stationId und apiKey Parameter entfernt, da ViewModel sie direkt aus AppStorage liest.
+                viewModel.startFetchingDataAutomatically()
             }
             .onDisappear {
                 // Stoppe den Timer, wenn das Menüleisten-Pop-over geschlossen wird.
@@ -70,7 +85,7 @@ struct MenuContentView: View {
         }
         .padding()
         .frame(width: popoverContentWidth) // Feste Breite für den VStack
-        .background(.ultraThinMaterial) // <-- Transparenter Hintergrund mit Material
+        .background(.ultraThinMaterial) // Transparenter Hintergrund mit Material
         .cornerRadius(10) // Abgerundete Ecken für das Popover
         .colorScheme(.dark) // Setzt das Farbschema des Popovers auf dunkel
     }
@@ -79,8 +94,8 @@ struct MenuContentView: View {
 // MARK: - MenuContentView_Previews
 struct MenuContentView_Previews: PreviewProvider {
     static var previews: some View {
-        // Für die Vorschau muss ein Mock-ViewModel und API-Infos übergeben werden.
-        MenuContentView(viewModel: WeatherViewModel(), stationId: "MOCK_ID", apiKey: "MOCK_KEY")
+        // Für die Vorschau muss nur noch ein Mock-ViewModel übergeben werden.
+        MenuContentView(viewModel: WeatherViewModel()) // <-- stationId und apiKey Parameter entfernt
             .padding()
             .frame(width: 300, height: 400) // Beispielgröße für die Vorschau
     }

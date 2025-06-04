@@ -9,12 +9,7 @@ import Foundation // Für URL, URLSession, JSONDecoder
 struct ContentView: View {
     // Erstellt eine Instanz des ViewModels und verwaltet deren Lebenszyklus.
     @ObservedObject var viewModel: WeatherViewModel // <-- Diese Zeile MUSS vorhanden sein!
-    
-    // Platzhalter für deine API-Informationen. ERSETZE DIESE!
-    private let stationId = "IMELLE143" // Beispiel: "KMAHANOV10"
-    private let apiKey = "50ca47653ab440628a47653ab47062a3" // Dein persönlicher API-Schlüssel
-
-    var body: some View {
+        var body: some View {
         // VStack für vertikale Anordnung der Elemente.
         VStack(spacing: 20) {
             Text("Aktuelle Wetterdaten")
@@ -95,7 +90,7 @@ struct ContentView: View {
             // Button zum manuellen Abrufen der Daten.
             Button("Laden") {
                 Task {
-                    await viewModel.fetchWeatherData(stationId: stationId, apiKey: apiKey)
+                    await viewModel.fetchWeatherData(units: "m")
                 }
             }
             .buttonStyle(.borderedProminent) // Moderner Button-Stil für macOS

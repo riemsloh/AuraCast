@@ -1,15 +1,7 @@
-//
-//  WeatherViewModel.swift
-//  AuraCast
-//
-//  Created by Olaf Lueg on 04.06.25.
-//
-
-
 // Copyright by Olaf Lueg
 
 import Foundation // Für URL, URLSession, JSONDecoder
-import SwiftUI // Für ObservableObject, @Published, @MainActor
+import SwiftUI // Für ObservableObject, @Published, @MainActor, @AppStorage
 
 // MARK: - WeatherViewModel
 /// Ein ViewModel, das die Logik für den Abruf und die Verwaltung von Wetterdaten kapselt.
@@ -23,27 +15,39 @@ class WeatherViewModel: ObservableObject {
     // Timer-Instanz für den automatischen Datenabruf
     private var timer: Timer?
     
+    // Lese die Konfigurationswerte direkt aus AppStorage
+    @AppStorage("selectedStationId") private var storedStationId: String = "YOUR_STATION_ID"
+    @AppStorage("apiKey") private var storedApiKey: String = "YOUR_WEATHER_API_KEY"
+    @AppStorage("autoRefreshEnabled") private var autoRefreshEnabled: Bool = true // Auch diese Einstellung wird hier benötigt
+
     // Die Basis-URL für die Weather Company PWS Observations API.
     private let baseURL = "https://api.weather.com/v2/pws/observations/current"
 
     /// Ruft Wetterdaten asynchron von der Weather Company API ab.
-    ///
-    /// - Parameters:
-    ///   - stationId: Die ID der Personal Weather Station (PWS).
-    ///   - apiKey: Dein API-Schlüssel für die Weather Company API.
-    ///   - units: Die gewünschte Maßeinheit (z.B. "m" für metrisch).
+    /// Verwendet die in AppStorage gespeicherten Werte für Station ID und API-Schlüssel.
     @MainActor // Stellt sicher, dass UI-Updates auf dem Haupt-Thread erfolgen
-    func fetchWeatherData(stationId: String, apiKey: String, units: String = "m") async {
+    func fetchWeatherData(units: String = "m") async { // Parameter für stationId und apiKey entfernt
+        // Nur abrufen, wenn automatische Aktualisierung aktiviert ist oder manuell ausgelöst wird
+        guard autoRefreshEnabled || !isLoading else { return } // Verhindert unnötige Aufrufe
+
         isLoading = true // Ladezustand aktivieren
         errorMessage = nil // Vorherige Fehlermeldungen zurücksetzen
         
+        // Überprüfen, ob API-Schlüssel und Station ID vorhanden sind
+        guard !storedStationId.isEmpty, !storedApiKey.isEmpty,
+              storedStationId != "YOUR_STATION_ID", storedApiKey != "YOUR_WEATHER_API_KEY" else {
+            errorMessage = "Bitte geben Sie eine gültige Station ID und einen API-Schlüssel in den Einstellungen ein."
+            isLoading = false
+            return
+        }
+
         // URL-Komponenten erstellen, um die URL sicher zusammenzusetzen.
         var components = URLComponents(string: baseURL)
         components?.queryItems = [
-            URLQueryItem(name: "stationId", value: stationId),
+            URLQueryItem(name: "stationId", value: storedStationId), // Nutze den gespeicherten Wert
             URLQueryItem(name: "format", value: "json"), // Wir erwarten JSON-Format
             URLQueryItem(name: "units", value: units), // Metrische Einheiten
-            URLQueryItem(name: "apiKey", value: apiKey)
+            URLQueryItem(name: "apiKey", value: storedApiKey) // Nutze den gespeicherten Wert
         ]
         
         // Überprüfen, ob die URL gültig ist.
@@ -78,6 +82,9 @@ class WeatherViewModel: ObservableObject {
             if observation == nil {
                 errorMessage = "Keine Wetterdaten für die angegebene Station gefunden."
             }
+            else{
+                print("Wetterdaten erfolgreich von Wunderground für \(observation?.neighborhood ?? "N/A") geladen!")
+            }
             
         } catch let decodingError as DecodingError {
             // Spezifische Fehler beim Decodieren abfangen.
@@ -94,20 +101,23 @@ class WeatherViewModel: ObservableObject {
     
     /// Startet einen Timer, der alle 60 Sekunden Wetterdaten abruft.
     /// Ungültig macht jeden zuvor gestarteten Timer.
-    func startFetchingDataAutomatically(stationId: String, apiKey: String) {
+    func startFetchingDataAutomatically() { // Parameter entfernt
         // Vorhandenen Timer ungültig machen, um doppelte Timer zu vermeiden
         timer?.invalidate()
         
+        // Nur starten, wenn automatische Aktualisierung aktiviert ist
+        guard autoRefreshEnabled else { return }
+
         // Neuen Timer erstellen, der alle 60 Sekunden feuert
         timer = Timer.scheduledTimer(withTimeInterval: 60.0, repeats: true) { [weak self] _ in
             // Sicherstellen, dass self noch existiert, bevor fetchWeatherData aufgerufen wird
             Task { @MainActor in
-                await self?.fetchWeatherData(stationId: stationId, apiKey: apiKey)
+                await self?.fetchWeatherData() // Ohne Parameter aufrufen
             }
         }
         // Sofortigen ersten Abruf starten
         Task { @MainActor in
-            await fetchWeatherData(stationId: stationId, apiKey: apiKey)
+            await fetchWeatherData() // Ohne Parameter aufrufen
         }
     }
     

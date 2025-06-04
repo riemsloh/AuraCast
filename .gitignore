@@ -1,62 +1,90 @@
 # Xcode
-#
-# gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
+.DS_Store
+*.xcodeproj/
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+*.xcworkspace/
+!*.xcworkspace/xcshareddata/
+*.playground/
+*.playgroundbook/
+*.xccheckout/
+*.xcassets/
+!*.xcassets/**/*.imageset/Contents.json
+!*.xcassets/**/*.launchimage/Contents.json
+!*.xcassets/**/*.appiconset/Contents.json
 
-## User settings
-xcuserdata/
-
-## Obj-C/Swift specific
-*.hmap
-
-## App packaging
+# Build-Artefakte
+build/
+*.xcarchive/
 *.ipa
 *.dSYM.zip
-*.dSYM
+*.app/
+*.framework/
+*.xcframework/
+*.o
+*.lo
+*.la
+*.dylib
+*.a
+*.so
+*.appex/
+*.bundle/
+*.xctest/
+*.dmg
+*.pkg
+*.zip
+*.tar
+*.gz
 
-## Playgrounds
-timeline.xctimeline
-playground.xcworkspace
-
-# Swift Package Manager
-#
-# Add this line if you want to avoid checking in source code from Swift Package Manager dependencies.
-# Packages/
-# Package.pins
-# Package.resolved
-# *.xcodeproj
-#
-# Xcode automatically generates this directory with a .xcworkspacedata file and xcuserdata
-# hence it is not needed unless you have added a package configuration file to your project
-# .swiftpm
-
+# Swift-spezifische Dateien
+.swiftpm/
 .build/
+Package.resolved
+DerivedData/
 
+# Abhängigkeitsmanager (falls verwendet)
 # CocoaPods
-#
-# We recommend against adding the Pods directory to your .gitignore. However
-# you should judge for yourself, the pros and cons are mentioned at:
-# https://guides.cocoapods.org/using/using-cocoapods.html#should-i-check-the-pods-directory-into-source-control
-#
-# Pods/
-#
-# Add this line if you want to avoid checking in source code from the Xcode workspace
-# *.xcworkspace
+Pods/
+Podfile.lock
 
 # Carthage
-#
-# Add this line if you want to avoid checking in source code from Carthage dependencies.
-# Carthage/Checkouts
+Carthage/
+*.xcframeworks/
 
-Carthage/Build/
+# Swift Package Manager (bereits oben abgedeckt, aber zur Klarheit)
+# .build/
+# Package.resolved
 
-# fastlane
-#
-# It is recommended to not store the screenshots in the git repo.
-# Instead, use fastlane to re-generate the screenshots whenever they are needed.
-# For more information about the recommended setup visit:
-# https://docs.fastlane.tools/best-practices/source-control/#source-control
+# Andere temporäre oder benutzerspezifische Dateien
+# Diese können je nach Entwicklungsumgebung variieren
+.vscode/ # Für VS Code Benutzer
+.idea/   # Für AppCode/IntelliJ Benutzer
+*.bak
+*.tmp
+*.log
+*.swp
+*.swo
+*.orig
+*.rej
+*.diff
 
-fastlane/report.xml
-fastlane/Preview.html
-fastlane/screenshots/**/*.png
-fastlane/test_output
+# User-spezifische Xcode-Dateien
+xcuserdata/
+*.xcuserdatad/
+*.xcuserstate
+*.mode1v3
+*.perspectivev3
+*.waf
+*.xccheckout
+*.xcscmblueprint
+*.xctestplan
+*.xcscheme
+
+# Crash-Logs
+*.crash
+
+# Lokale Umgebungsvariablen (falls verwendet)
+.env
+.env.*
+.local
+.DS_Store

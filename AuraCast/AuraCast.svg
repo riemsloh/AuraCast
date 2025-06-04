@@ -1,0 +1,18 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="256" height="256" rx="57.6" fill="#1A1A1A"/> <!-- Dunkler Hintergrund für macOS-Look, abgerundete Ecken -->
+
+<!-- Stilisierte Wolke -->
+<path d="M192 128C192 106.909 174.091 89 153 89C145.455 89 138.455 91.7273 133.091 96.3636C127.727 75.2727 109.818 58.1818 88.7273 58.1818C67.6364 58.1818 50.5455 75.2727 50.5455 96.3636C50.5455 97.4545 50.5455 98.5455 50.5455 99.6364C42.9091 106.909 38.2727 116.545 38.2727 127.182C38.2727 148.273 55.3636 165.364 76.4545 165.364H170.909C182.545 165.364 192 155.909 192 144.273V128Z" fill="url(#cloudGradient)"/>
+
+<!-- Aura-Effekt / Datenlinien (subtil) -->
+<path d="M128 178C128 178 140 188 153 178" stroke="#4CAF50" stroke-width="6" stroke-linecap="round"/>
+<path d="M100 178C100 178 112 188 125 178" stroke="#4CAF50" stroke-width="6" stroke-linecap="round"/>
+
+<!-- Gradient für die Wolke -->
+<defs>
+<linearGradient id="cloudGradient" x1="121.136" y1="58.1818" x2="121.136" y2="165.364" gradientUnits="userSpaceOnUse">
+<stop stop-color="#FFFFFF"/>
+<stop offset="1" stop-color="#E0E0E0"/>
+</linearGradient>
+</defs>
+</svg>

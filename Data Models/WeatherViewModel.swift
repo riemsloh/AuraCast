@@ -101,25 +101,45 @@ class WeatherViewModel: ObservableObject {
     
     /// Startet einen Timer, der alle 60 Sekunden Wetterdaten abruft.
     /// Ungültig macht jeden zuvor gestarteten Timer.
-    func startFetchingDataAutomatically() { // Parameter entfernt
-        // Vorhandenen Timer ungültig machen, um doppelte Timer zu vermeiden
-        timer?.invalidate()
-        
-        // Nur starten, wenn automatische Aktualisierung aktiviert ist
-        guard autoRefreshEnabled else { return }
+    ///
 
-        // Neuen Timer erstellen, der alle 60 Sekunden feuert
-        timer = Timer.scheduledTimer(withTimeInterval: 60.0, repeats: true) { [weak self] _ in
-            // Sicherstellen, dass self noch existiert, bevor fetchWeatherData aufgerufen wird
-            Task { @MainActor in
-                await self?.fetchWeatherData() // Ohne Parameter aufrufen
+    func startFetchingDataAutomatically() {
+            // Vorhandenen Timer ungültig machen, um doppelte Timer zu vermeiden
+            timer?.invalidate()
+            
+            // Nur starten, wenn automatische Aktualisierung aktiviert ist
+            guard autoRefreshEnabled else { return }
+
+            // Neuen Timer erstellen, der alle 60 Sekunden feuert
+            // [weak self] in der Timer-Closure verwenden, um Retain-Cycles zu vermeiden
+            timer = Timer.scheduledTimer(withTimeInterval: 60.0, repeats: true) { [weak self] _ in
+                // Sicherstellen, dass self noch existiert, bevor fetchWeatherData aufgerufen wird
+#if swift(>=6.0)
+                Task { @MainActor in
+                    await self?.fetchWeatherData() // Hier self? verwenden
+                }
+#elseif swift(<5.9)
+                Task {
+                    await self?.fetchWeatherData() // Hier self? verwenden
+                }
+#endif
             }
-        }
-        // Sofortigen ersten Abruf starten
+            // Sofortigen ersten Abruf starten
+            // Auch hier [weak self] verwenden, um Probleme bei der Deallokation von ViewModel zu vermeiden
+#if swift(>=6.0)
         Task { @MainActor in
-            await fetchWeatherData() // Ohne Parameter aufrufen
+            await self.fetchWeatherData() // Hier self? verwenden
+            }
+#elseif swift(<5.9)
+        Task {
+            await self.fetchWeatherData() // Hier self? verwenden
+            }
+#else
+        Task {
+            await self.fetchWeatherData() // Hier self? verwenden
+            }
+        #endif
         }
-    }
     
     /// Stoppt den automatischen Datenabruf-Timer.
     func stopFetchingDataAutomatically() {

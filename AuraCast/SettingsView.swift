@@ -17,6 +17,11 @@ struct SettingsView: View {
     @AppStorage("selectedStationId") var selectedStationId: String = "YOUR_STATION_ID" // Standard-Station ID
     @AppStorage("apiKey") var apiKey: String = "YOUR_WEATHER_API_KEY" // <-- Hinzugefügt: API-Schlüssel
     @AppStorage("displayTemperatureUnit") var displayTemperatureUnit: String = "Celsius" // z.B. "Celsius" oder "Fahrenheit"
+    
+    // Hinzugefügte @AppStorage-Variablen für Längen- und Breitengrad,
+    // um sie in den Einstellungen verfügbar zu machen.
+    @AppStorage("latitude") private var storedLatitude: Double = 52.2039 // Beispiel: Melle Latitude
+    @AppStorage("longitude") private var storedLongitude: Double = 8.3374 // Beispiel: Melle Longitude
 
     var body: some View {
         Form {
@@ -41,6 +46,19 @@ struct SettingsView: View {
                     .textFieldStyle(.roundedBorder)
                     .disableAutocorrection(true)
                 Text("Geben Sie Ihren API-Schlüssel für die Wetterdaten ein.")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+                
+                // Hinzugefügte Textfelder für Längen- und Breitengrad
+                TextField("Breitengrad (Latitude)", value: $storedLatitude, formatter: NumberFormatter())
+                    .textFieldStyle(.roundedBorder)
+                Text("Geben Sie den Breitengrad für die Wettervorhersage ein (z.B. 52.2039).")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+
+                TextField("Längengrad (Longitude)", value: $storedLongitude, formatter: NumberFormatter())
+                    .textFieldStyle(.roundedBorder)
+                Text("Geben Sie den Längengrad für die Wettervorhersage ein (z.B. 8.3374).")
                     .font(.caption)
                     .foregroundColor(.gray)
                 

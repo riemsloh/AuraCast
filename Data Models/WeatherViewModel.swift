@@ -122,6 +122,10 @@ class WeatherViewModel: ObservableObject {
                 Task {
                     await self?.fetchWeatherData() // Hier self? verwenden
                 }
+#else
+                Task {
+                    await self?.fetchWeatherData() // Hier self? verwenden
+                }
 #endif
             }
             // Sofortigen ersten Abruf starten

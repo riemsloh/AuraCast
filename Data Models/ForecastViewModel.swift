@@ -17,6 +17,9 @@ class ForecastViewModel: ObservableObject {
     @Published var isLoading: Bool = false // Zeigt an, ob Daten geladen werden
     @Published var errorMessage: String? // Speichert die Fehlermeldungen
     
+    // Timer-Instanz für den automatischen Datenabruf
+    private var timer: Timer?
+    
     // Lese die Konfigurationswerte direkt aus AppStorage
     @AppStorage("apiKey") private var storedApiKey: String = "YOUR_WEATHER_API_KEY"
     // Annahme: Standortdaten werden über eine andere Quelle (z.B. CLLocationManager) bereitgestellt
@@ -25,6 +28,8 @@ class ForecastViewModel: ObservableObject {
     // In einer realen App würden diese von einem Standortdienst kommen.
     @AppStorage("latitude") private var storedLatitude: Double = 52.2039 // Beispiel: Melle Latitude
     @AppStorage("longitude") private var storedLongitude: Double = 8.3374 // Beispiel: Melle Longitude
+    
+    @AppStorage("autoRefreshEnabled") private var autoRefreshEnabled: Bool = true // Auch diese Einstellung wird hier benötigt
     
     // Die Basis-URL für die Weather Company 5 Day Forecast API.
     private let baseURL = "https://api.weather.com/v3/wx/forecast/daily/5day"
@@ -101,5 +106,62 @@ class ForecastViewModel: ObservableObject {
         }
         
         isLoading = false // Ladezustand deaktivieren
+    }
+    
+    /// Startet einen Timer, der alle 60 Sekunden Wetterdaten abruft.
+    /// Ungültig macht jeden zuvor gestarteten Timer.
+    ///
+
+    func startFetchingDataAutomatically() {
+            // Vorhandenen Timer ungültig machen, um doppelte Timer zu vermeiden
+            timer?.invalidate()
+            
+            // Nur starten, wenn automatische Aktualisierung aktiviert ist
+            guard autoRefreshEnabled else { return }
+
+            // Neuen Timer erstellen, der alle 60 Sekunden feuert
+            // [weak self] in der Timer-Closure verwenden, um Retain-Cycles zu vermeiden
+            timer = Timer.scheduledTimer(withTimeInterval: 60.0, repeats: true) { [weak self] _ in
+                // Sicherstellen, dass self noch existiert, bevor fetchWeatherData aufgerufen wird
+#if swift(>=6.0)
+                Task { @MainActor in
+                    await self?.fetchForecastData() // Hier self? verwenden
+                }
+#elseif swift(<5.9)
+                Task {
+                    await self?.fetchForecastData() // Hier self? verwenden
+                }
+#else
+                Task {
+                    await self?.fetchForecastData() // Hier self? verwenden
+                }
+#endif
+            }
+            // Sofortigen ersten Abruf starten
+            // Auch hier [weak self] verwenden, um Probleme bei der Deallokation von ViewModel zu vermeiden
+#if swift(>=6.0)
+        Task { @MainActor in
+            await self.fetchForecastData() // Hier self? verwenden
+            }
+#elseif swift(<5.9)
+        Task {
+            await self.fetchForecastData() // Hier self? verwenden
+            }
+#else
+        Task {
+            await self.fetchForecastData() // Hier self? verwenden
+            }
+        #endif
+        }
+    
+    /// Stoppt den automatischen Datenabruf-Timer.
+    func stopFetchingDataAutomatically() {
+        timer?.invalidate()
+        timer = nil
+    }
+    
+    // Beim Deinitialisieren des ViewModels den Timer stoppen, um Memory Leaks zu vermeiden
+    deinit {
+        stopFetchingDataAutomatically()
     }
 }

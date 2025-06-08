@@ -13,6 +13,7 @@ import SwiftUI
 struct MenuContentView: View {
     // Empfängt das ViewModel von der AuraCastApp.
     @ObservedObject var viewModel: WeatherViewModel
+    @ObservedObject var forecastModel: ForecastViewModel
     
     // Empfängt API-Informationen von der AuraCastApp.
     // Diese sind jetzt nicht mehr nötig, da das ViewModel sie direkt aus AppStorage liest.
@@ -77,10 +78,12 @@ struct MenuContentView: View {
             .onAppear {
                 // stationId und apiKey Parameter entfernt, da ViewModel sie direkt aus AppStorage liest.
                 viewModel.startFetchingDataAutomatically()
+                forecastModel.startFetchingDataAutomatically()
             }
             .onDisappear {
                 // Stoppe den Timer, wenn das Menüleisten-Pop-over geschlossen wird.
                 viewModel.stopFetchingDataAutomatically()
+                forecastModel.stopFetchingDataAutomatically()
             }
         }
         .padding()
@@ -95,7 +98,7 @@ struct MenuContentView: View {
 struct MenuContentView_Previews: PreviewProvider {
     static var previews: some View {
         // Für die Vorschau muss nur noch ein Mock-ViewModel übergeben werden.
-        MenuContentView(viewModel: WeatherViewModel()) // <-- stationId und apiKey Parameter entfernt
+        MenuContentView(viewModel: WeatherViewModel(), forecastModel: ForecastViewModel()) // <-- stationId und apiKey Parameter entfernt
             .padding()
             .frame(width: 300, height: 400) // Beispielgröße für die Vorschau
     }

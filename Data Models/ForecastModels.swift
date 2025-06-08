@@ -21,16 +21,16 @@ struct ForecastResponse: Codable {
     let moonPhaseCode: [String]?
     let moonPhaseDay: [Int]?
     let moonriseTimeLocal: [String]?
-    let moonriseTimeUtc: [Int]?
+    let moonriseTimeUtc: [Int?]?
     let moonsetTimeLocal: [String]?
-    let moonsetTimeUtc: [Int]?
+    let moonsetTimeUtc: [Int?]?
     let narrative: [String]?
     let qpf: [Double]? // Gesamtniederschlag
     let qpfSnow: [Double]? // Gesamtschneemenge
     let sunriseTimeLocal: [String]?
-    let sunriseTimeUtc: [Int]?
+    let sunriseTimeUtc: [Int?]?
     let sunsetTimeLocal: [String]?
-    let sunsetTimeUtc: [Int]?
+    let sunsetTimeUtc: [Int?]?
     
     // temperatureMax/Min auf Top-Level können null sein (siehe API-Doku nach 15 Uhr)
     let temperatureMax: [Int?]? // Geändert zu optionalem Array von optionalen Ints

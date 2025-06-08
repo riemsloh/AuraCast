@@ -19,7 +19,7 @@ struct ContentView: View {
                 Section("Garten") {
                     NavigationLink {
                         // Die Destination dieser NavigationLinks erscheint in der Detail-Spalte
-                        someView(viewModel: WeatherViewModel(), forecastModel: ForecastViewModel())
+                        someView(viewModel: viewModel, forecastModel: forecastModel)
                     } label: {
                         Label("Garten Station", systemImage: "house.fill")
                     }
